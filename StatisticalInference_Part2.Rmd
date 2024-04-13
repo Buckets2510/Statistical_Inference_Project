@@ -1,0 +1,91 @@
+---
+title: "Statistical Inference Project - Part Two"
+author: "Brandon Robinson"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+The purpose of the project is to investigate two parts relating statistical analysis of data. Part 1 is to perform a simulation on random data and analyze following the Central Limit Theorem. Part 2 uses a dataset from the R dataset library to perform an analysis and derive a conclusion.
+
+### Part 2  - Basic Inferential Data Analysis
+
+Instructions for Part 2 are as follows:
+1. Load the ToothGrowth data and perform some basic exploratory data analyses
+2. Provide a basic summary of the data.
+3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+4. State your conclusions and the assumptions needed for your conclusions.
+
+#### Question 1 - Load the ToothGrowth data and perform some basic exploratory data analyses
+First, the required packages will be loaded in order to run the analysis and create the plots
+
+```{r echo = TRUE}
+library(dplyr)
+library(ggplot2)
+```
+
+Next, we load the data from the dataset library
+```{r echo = TRUE}
+data("ToothGrowth")
+```
+
+The dataset shows the effect of vitamin c on the tooth growth in 60 guinea pigs. Each animal received dose levels of 0.5, 1, and 2 mg/day by two delivery methods, orange juice (OJ) and vitamin c (VC)
+
+#### Question 2 - Perform some basic exploratory data analyses
+Then, we perform a basic summary of the dataset
+```{r echo = TRUE}
+# Overview of each variable in the dataset
+summary(ToothGrowth)
+head(ToothGrowth)
+unique(ToothGrowth$len)
+unique(ToothGrowth$supp)
+unique(ToothGrowth$dose)
+```
+
+```{r echo = TRUE}
+# View the first 6 occurrences
+head(ToothGrowth)
+```
+
+```{r echo = TRUE}
+# Identify the unique values for each variable
+unique(ToothGrowth$len)
+unique(ToothGrowth$supp)
+unique(ToothGrowth$dose)
+```
+
+Next, we plot the initial findings from the dataset
+```{r echo = TRUE}
+ggplot(ToothGrowth, aes(x=factor(supp), y=len)) +
+        facet_grid(.~dose) + 
+        geom_boxplot(aes(fill = factor(dose)), show.legend = TRUE) +
+        labs(title = "Tooth Length of Guinea Pigs based on doses and supply methods ", x="Supply Type", y="Tooth Length")
+```
+
+From the plot we can see as we approach a dosage of 2mg it cannot be concluded if one supplement is more effective than another. We will test this in the next section.
+
+#### Question 3: Use confidence intervals or hypothesis test to compare the tooth growth by supp and dose.
+
+The first test will look at tooth growth by supplement
+```{r echo = TRUE}
+t.test(len ~ supp, data = ToothGrowth)
+```
+
+Next, we will look at the dosage level of each supplement compared to tooth growth
+```{r echo = TRUE}
+t.test(len ~ supp, data = subset(ToothGrowth, dose == 0.5))
+t.test(len ~ supp, data = subset(ToothGrowth, dose == 1))
+t.test(len ~ supp, data = subset(ToothGrowth, dose == 2))
+```
+Between 0.5 to 1mg the hypothesis that OJ delivers more than growth can be accepted since the p-value is < 0.05 and the confidence interval does not include 0
+At 2mg the null hypothesis can be rejected since the p-value is > 0.05 and the confidence interval includes 0
+
+#### Conclusion
+Based on the full dataset it cannot be concluded that one supplement is not more effective than another for tooth growth
